@@ -1,0 +1,21 @@
+{
+  "name": "qq-bot-rebown-tg-fwd",
+  "version": "0.1.0",
+  "description": "Forward msg from QQ group to Telegram group",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "qq",
+    "telegram",
+    "forward",
+    "bot"
+  ],
+  "author": "rocka <i@rocka.me>",
+  "license": "MIT",
+  "dependencies": {
+    "qq-bot-rebown": "^0.1.6",
+    "telegraf": "^3.11.1"
+  }
+}
