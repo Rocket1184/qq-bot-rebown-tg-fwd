@@ -13,9 +13,13 @@
     "bot"
   ],
   "author": "rocka <i@rocka.me>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rocket1184/qq-bot-rebown-tg-fwd.git"
+  },
   "license": "MIT",
   "dependencies": {
-    "qq-bot-rebown": "^0.1.7",
+    "qq-bot-rebown": "^1.0.1",
     "telegraf": "^3.11.1"
   }
 }
