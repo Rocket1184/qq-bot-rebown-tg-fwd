@@ -1,6 +1,6 @@
 {
   "name": "qq-bot-rebown-tg-fwd",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Forward msg from QQ group to Telegram group",
   "main": "index.js",
   "scripts": {
