@@ -19,7 +19,7 @@ const tgBot = new tg.Telegram(config.tg.bot_token);
 const qqBot = new qq.QQ();
 
 qqBot.on('group', msg => {
-    if (~msg.groupName.indexOf(config.qq.group_name)) {
+    if (~config.qq.group_names.indexOf(msg.groupName)) {
         for (let kwd of config.qq.listen_keywords) {
             if (~msg.content.indexOf(kwd)) {
                 tgBot.sendMessage(

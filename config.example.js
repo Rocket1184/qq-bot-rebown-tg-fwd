@@ -19,7 +19,10 @@ module.exports = {
     },
     qq: {
         // QQ group FULL name
-        group_name: '...',
+        group_names: [
+            'test_group',
+            'another_group'
+        ],
         // keywords to listen
         listen_keywords: [
             'fwd',
