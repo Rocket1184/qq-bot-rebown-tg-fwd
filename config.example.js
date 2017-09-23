@@ -14,7 +14,7 @@ module.exports = {
         // msg: { name: string; content: string; groupName: string }
         // kwd: string, matched keyword
         transformMsg: function (msg, kwd) {
-            return `[${msg.name}] ${msg.content.replace(kwd, `\`${kwd}\``)}`;
+            return `[[${msg.name}]] ${msg.content.replace(kwd, `\`${kwd}\``)}`;
         }
     },
     qq: {

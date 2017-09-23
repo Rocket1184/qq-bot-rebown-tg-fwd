@@ -8,7 +8,7 @@ const qq = require('qq-bot-rebown');
 const config = require('./config');
 
 const server = http.createServer((req, res) => {
-    if (req.method === 'get' && ~req.url.indexOf(config.server.get_qr_path)) {
+    if (req.method === 'GET' && ~req.url.indexOf(config.server.get_qr_path)) {
         fs.createReadStream('/tmp/code.png').pipe(res);
     }
 });
