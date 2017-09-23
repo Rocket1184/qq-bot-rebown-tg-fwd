@@ -15,7 +15,7 @@
   "author": "rocka <i@rocka.me>",
   "license": "MIT",
   "dependencies": {
-    "qq-bot-rebown": "^0.1.6",
+    "qq-bot-rebown": "^0.1.7",
     "telegraf": "^3.11.1"
   }
 }
