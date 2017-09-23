@@ -25,12 +25,15 @@ module.exports = {
         // msg: { name: string; content: string; groupName: string }
         // kwd: string, matched keyword
         transformMsg: function (msg, kwd) {
-            return `[${msg.name}] ${msg.content.replace(kwd, `\`${kwd}\``)}`;
+            return `[[${msg.name}]] ${msg.content.replace(kwd, `\`${kwd}\``)}`;
         }
     },
     qq: {
         // QQ group FULL name
-        group_name: '...',
+        group_names: [
+            'test_group',
+            'another_group'
+        ],
         // keywords to listen
         listen_keywords: [
             'fwd',
