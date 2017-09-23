@@ -16,24 +16,22 @@ const server = http.createServer((req, res) => {
 server.listen(config.server.port);
 
 const tgBot = new tg.Telegram(config.tg.bot_token);
+const qqBot = new qq.QQ();
 
-const qqMsgHandler = new qq.MsgHandler(
-    (msg, qq) => {
-        if (~msg.groupName.indexOf(config.qq.group_name)) {
-            for (let kwd of config.qq.listen_keywords) {
-                if (~msg.content.indexOf(kwd)) {
-                    tgBot.sendMessage(
-                        config.tg.chat_id,
-                        config.tg.transformMsg(msg, kwd), {
-                            parse_mode: "Markdown"
-                        }
-                    );
-                    return;
-                }
+qqBot.on('group', msg => {
+    if (~msg.groupName.indexOf(config.qq.group_name)) {
+        for (let kwd of config.qq.listen_keywords) {
+            if (~msg.content.indexOf(kwd)) {
+                tgBot.sendMessage(
+                    config.tg.chat_id,
+                    config.tg.transformMsg(msg, kwd), {
+                        parse_mode: "Markdown"
+                    }
+                );
+                return;
             }
         }
-    },
-    'group'
-)
+    }
+})
 
-const qqBot = new qq.QQ(qqMsgHandler).run();
+qqBot.run();
