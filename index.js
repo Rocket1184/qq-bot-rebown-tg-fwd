@@ -7,16 +7,16 @@ const tg = require('telegraf');
 const qq = require('qq-bot-rebown');
 const config = require('./config');
 
+const tgBot = new tg.Telegram(config.tg.bot_token);
+const qqBot = new qq.QQ();
+
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && ~req.url.indexOf(config.server.get_qr_path)) {
-        fs.createReadStream('/tmp/code.png').pipe(res);
+        fs.createReadStream(qqBot.options.qrcodePath).pipe(res);
     }
 });
 
 server.listen(config.server.port);
-
-const tgBot = new tg.Telegram(config.tg.bot_token);
-const qqBot = new qq.QQ();
 
 qqBot.on('group', msg => {
     if (~config.qq.group_names.indexOf(msg.groupName)) {
