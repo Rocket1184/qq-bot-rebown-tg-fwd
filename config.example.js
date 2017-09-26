@@ -9,6 +9,8 @@ module.exports = {
         bot_token: '123456:ABCdef_ghiJKLmnOPQrstu-vw',
         // Telegram group chat ID, can be number or @group_name
         chat_id: '@group_name',
+        // Bot Manager ID, for receiving QR Codes
+        manager_id: 000000000,
         // function to transform forwarded msg, you can use markdown in output
         // arguments:
         // msg: { name: string; content: string; groupName: string }
