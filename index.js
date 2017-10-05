@@ -34,6 +34,24 @@ tgBot.command('whoami', (ctx) => {
     });
 });
 
+tgBot.command('whereisthis', (ctx) => {
+    let message;
+    switch (ctx.message.chat.type) {
+        case 'group':
+            message = `This group uid is \`${ctx.message.chat.id}\``;
+            break;
+        case 'private':
+            message = `This private chat id as well as your uid is \`${ctx.message.chat.id}\``;
+            break;
+        default:
+            message = `Chat type: ${ctx.message.chat.type}; Chat id ${ctx.message.chat.id}`;
+    }
+    ctx.reply(message, {
+        parse_mode: "Markdown",
+        reply_to_message_id: ctx.message.message_id
+    });
+});
+
 tgBot.startPolling();
 
 qqBot.on('group', msg => {

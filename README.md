@@ -20,3 +20,7 @@ node index.js
 1. `/whoami`
 
 Query your Telegram uid. Fill `config.tg.manager_id` with the result.
+
+2. `/whereisthis`
+
+Query current chat id. Can be used in `config.tg.chat_id`.
