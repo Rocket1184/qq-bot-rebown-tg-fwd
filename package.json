@@ -19,7 +19,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "qq-bot-rebown": "^1.2.0",
+    "qq-bot-rebown": "^1.2.2",
     "telegraf": "^3.12.1"
   }
 }
