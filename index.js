@@ -52,22 +52,68 @@ tgBot.command('whereisthis', (ctx) => {
     });
 });
 
+tgBot.on('message', (ctx) => {
+    if (!qqBot.isAlive) return;
+    switch (ctx.message.chat.type) {
+        case 'group':
+        case 'supergroup':
+            const { id, username } = ctx.message.chat;
+            config.rules.forEach(r => {
+                if (r.tg_chat_id == id || r.tg_chat_id == username) {
+                    switch (r.type) {
+                        case '2way':
+                            if (!r.gid) r.gid = qqBot.group
+                                .filter(g => g.name == r.qq_group_name)
+                                .map(g => g.gid)
+                                .pop();
+                            const msg = config.qq.transformMsg(ctx.message);
+                            // stroe last sent msg, to avoid duplicate forward
+                            r.lastMsg = msg;
+                            qqBot.sendGroupMsg(r.gid, msg);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            break;
+        default:
+            break;
+    }
+});
+
 tgBot.startPolling();
 
 qqBot.on('group', msg => {
-    if (~config.qq.group_names.indexOf(msg.groupName)) {
-        for (let kwd of config.qq.listen_keywords) {
-            if (~msg.content.indexOf(kwd)) {
-                tgBot.telegram.sendMessage(
-                    config.tg.chat_id,
-                    config.tg.transformMsg(msg, kwd), {
-                        parse_mode: "Markdown"
+    config.rules.forEach(r => {
+        if (r.qq_group_name === msg.groupName) {
+            switch (r.type) {
+                case '2way':
+                    // do not forward if this msg was sent by myself just now
+                    if (msg.content === r.lastMsg) return;
+                    tgBot.telegram.sendMessage(
+                        r.tg_chat_id,
+                        config.tg.transformMsg(msg)
+                    );
+                    break;
+                case 'qq2tg':
+                    for (let kwd of config.qq.listen_keywords) {
+                        if (~msg.content.indexOf(kwd)) {
+                            tgBot.telegram.sendMessage(
+                                config.tg.chat_id,
+                                config.tg.transformMsg(msg, kwd), {
+                                    parse_mode: "Markdown"
+                                }
+                            );
+                            return;
+                        }
                     }
-                );
-                return;
+                    break;
+                default:
+                    break;
             }
         }
-    }
+    });
 });
 
 qqBot.on('login', () => {
