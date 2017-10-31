@@ -10,11 +10,11 @@ module.exports = {
     tg: {
         // Use proxy to connect telegram. Support `socks:` and `socks5:`
         // Fill it with `null` if you do not want to use proxy
-        proxy: 'socks5://127.0.0.1:1080'
+        proxy: 'socks5://127.0.0.1:1080',
         // Telegram bot token
         bot_token: '123456:ABCdef_ghiJKLmnOPQrstu-vw',
         // Bot Manager ID, for receiving QR Codes
-        manager_id: 000000000,
+        manager_id: 123456789,
         // function to transform msg from QQ, you can use markdown in output
         // arguments:
         // msg: { name: string; content: string; groupName: string }
