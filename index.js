@@ -5,9 +5,17 @@ const http = require('http');
 
 const tg = require('telegraf');
 const qq = require('qq-bot-rebown');
+const SocksProxyAgent = require('socks-proxy-agent');
+
 const config = require('./config');
 
-const tgBot = new tg(config.tg.bot_token);
+const telegrafOpt = { telegram: {} };
+
+if (config.tg.proxy) {
+    telegrafOpt.telegram.agent = new SocksProxyAgent(config.tg.proxy);
+}
+
+const tgBot = new tg(config.tg.bot_token, telegrafOpt);
 const qqBot = new qq.QQ();
 
 const server = http.createServer((req, res) => {
@@ -19,17 +27,17 @@ const server = http.createServer((req, res) => {
 server.listen(config.server.port);
 
 function notifyManager(...args) {
-    tgBot.telegram.sendMessage(config.tg.manager_id, ...args)
+    tgBot.telegram.sendMessage(config.tg.manager_id, ...args);
 }
 
 // Set bot username
 tgBot.telegram.getMe().then((botInfo) => {
-    tgBot.options.username = botInfo.username
+    tgBot.options.username = botInfo.username;
 });
 
 tgBot.command('whoami', (ctx) => {
     ctx.reply(`Your Telegram uid is \`${ctx.message.from.id}\``, {
-        parse_mode: "Markdown",
+        parse_mode: 'Markdown',
         reply_to_message_id: ctx.message.message_id
     });
 });
@@ -47,7 +55,7 @@ tgBot.command('whereisthis', (ctx) => {
             message = `Chat type: ${ctx.message.chat.type}; Chat id ${ctx.message.chat.id}`;
     }
     ctx.reply(message, {
-        parse_mode: "Markdown",
+        parse_mode: 'Markdown',
         reply_to_message_id: ctx.message.message_id
     });
 });
@@ -93,7 +101,9 @@ qqBot.on('group', msg => {
                     if (msg.content === r.lastMsg) return;
                     tgBot.telegram.sendMessage(
                         r.tg_chat_id,
-                        config.tg.transformMsg(msg)
+                        config.tg.transformMsg(msg), {
+                            parse_mode: 'Markdown'
+                        }
                     );
                     break;
                 case 'qq2tg':
@@ -102,7 +112,7 @@ qqBot.on('group', msg => {
                             tgBot.telegram.sendMessage(
                                 config.tg.chat_id,
                                 config.tg.transformMsg(msg, kwd), {
-                                    parse_mode: "Markdown"
+                                    parse_mode: 'Markdown'
                                 }
                             );
                             return;
@@ -133,7 +143,7 @@ qqBot.on('qr-expire', () => {
 
 qqBot.on('start-poll', () => {
     notifyManager(`QQ Bot \`${qqBot.selfInfo.nick}\` on line`, {
-        parse_mode: "Markdown"
+        parse_mode: 'Markdown'
     });
 });
 

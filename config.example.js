@@ -8,6 +8,9 @@ module.exports = {
         port: 34737
     },
     tg: {
+        // Use proxy to connect telegram. Support `socks:` and `socks5:`
+        // Fill it with `null` if you do not want to use proxy
+        proxy: 'socks5://127.0.0.1:1080'
         // Telegram bot token
         bot_token: '123456:ABCdef_ghiJKLmnOPQrstu-vw',
         // Bot Manager ID, for receiving QR Codes
@@ -18,9 +21,9 @@ module.exports = {
         // kwd: string, matched keyword, can be `undefined` in mode 'both'
         transformMsg: function (msg, kwd) {
             if (kwd) {
-                return `[[${msg.name}]] ${msg.content.replace(kwd, `\`${kwd}\``)}`;
+                return `*[${msg.name}]* ${msg.content.replace(kwd, `\`${kwd}\``)}`;
             } else {
-                return `[${msg.name}] ${msg.content}`;
+                return `*[${msg.name}]* ${msg.content}`;
             }
         }
     },

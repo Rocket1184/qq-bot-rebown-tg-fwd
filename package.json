@@ -19,7 +19,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "qq-bot-rebown": "^1.2.2",
-    "telegraf": "^3.12.1"
+    "qq-bot-rebown": "^1.3.3",
+    "socks-proxy-agent": "^3.0.1",
+    "telegraf": "^3.14.0"
   }
 }
