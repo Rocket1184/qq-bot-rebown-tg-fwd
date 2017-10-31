@@ -64,4 +64,4 @@ module.exports = {
         }
         // may add more following above ...
     ]
-}
+};
