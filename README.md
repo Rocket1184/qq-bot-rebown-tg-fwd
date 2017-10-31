@@ -1,6 +1,10 @@
 # qq-bot-rebown-tg-fwd
 
-Forward msg contains specific words from QQ group to Telegram group
+Forward **text** messages between Telegram group and QQ group
+
+QQ support by [qq-bot-rebown](https://github.com/rocket1184/qq-bot-rebown)
+
+Telegram support by [telegraf](https://github.com/telegraf/telegraf)
 
 ## Usage
 
