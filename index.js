@@ -107,7 +107,7 @@ qqBot.on('group', msg => {
                     );
                     break;
                 case 'qq2tg':
-                    for (let kwd of config.qq.listen_keywords) {
+                    for (let kwd of r.listen_keywords) {
                         if (~msg.content.indexOf(kwd)) {
                             tgBot.telegram.sendMessage(
                                 config.tg.chat_id,
