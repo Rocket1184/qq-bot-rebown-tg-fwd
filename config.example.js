@@ -28,6 +28,10 @@ module.exports = {
         }
     },
     qq: {
+        // QQ ID
+        id: 1000086,
+        // QQ pwd
+        pwd: 'my_qq_pwd',
         // function to transform msg from Telegram. Plain text only.
         // argument:
         // msg: {

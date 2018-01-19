@@ -16,7 +16,16 @@ if (config.tg.proxy) {
 }
 
 const tgBot = new tg(config.tg.bot_token, telegrafOpt);
-const qqBot = new qq.QQ();
+
+let qqOpt = {};
+if (config.qq.id && config.qq.pwd) {
+    qqOpt = {
+        app: { login: qq.QQ.LOGIN.PWD },
+        auth: { u: config.qq.id, p: config.qq.pwd }
+    }
+}
+
+const qqBot = new qq.QQ(qqOpt);
 
 const server = http.createServer((req, res) => {
     if (req.method === 'GET' && ~req.url.indexOf(config.server.get_qr_path)) {
@@ -59,6 +68,8 @@ tgBot.command('whereisthis', (ctx) => {
         reply_to_message_id: ctx.message.message_id
     });
 });
+
+/* eslint-disable  no-case-declarations */
 
 tgBot.on('message', (ctx) => {
     if (!qqBot.isAlive) return;
