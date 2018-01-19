@@ -72,7 +72,7 @@ tgBot.command('whereisthis', (ctx) => {
 /* eslint-disable  no-case-declarations */
 
 tgBot.on('message', (ctx) => {
-    if (!qqBot.isAlive) return;
+    if (!qqBot._alive) return;
     switch (ctx.message.chat.type) {
         case 'group':
         case 'supergroup':
