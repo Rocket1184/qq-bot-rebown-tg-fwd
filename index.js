@@ -162,4 +162,12 @@ qqBot.on('disconnect', () => {
     notifyManager('QQ Bot disconnected');
 });
 
+qqBot.on('error', err => {
+    notifyManager(`QQ Bot encountered error:
+\`\`\`
+${err}
+\`\`\`
+`, { parse_mode: 'Markdown' });
+})
+
 qqBot.run();
