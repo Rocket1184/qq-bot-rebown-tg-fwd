@@ -112,19 +112,17 @@ qqBot.on('group', msg => {
                     if (msg.content === r.lastMsg) return;
                     tgBot.telegram.sendMessage(
                         r.tg_chat_id,
-                        config.tg.transformMsg(msg), {
-                            parse_mode: 'Markdown'
-                        }
+                        config.tg.transformMsg(msg),
+                        { parse_mode: 'HTML' }
                     );
                     break;
                 case 'qq2tg':
                     for (let kwd of r.listen_keywords) {
-                        if (~msg.content.indexOf(kwd)) {
+                        if (msg.content.includes(kwd)) {
                             tgBot.telegram.sendMessage(
-                                config.tg.chat_id,
-                                config.tg.transformMsg(msg, kwd), {
-                                    parse_mode: 'Markdown'
-                                }
+                                r.tg_chat_id,
+                                config.tg.transformMsg(msg, kwd),
+                                { parse_mode: 'HTML' }
                             );
                             return;
                         }

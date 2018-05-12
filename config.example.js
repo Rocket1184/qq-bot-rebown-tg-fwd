@@ -15,16 +15,16 @@ module.exports = {
         bot_token: '123456:ABCdef_ghiJKLmnOPQrstu-vw',
         // Bot Manager ID, for receiving QR Codes
         manager_id: 123456789,
-        // function to transform msg from QQ, you can use markdown in output
+        // function to transform msg from QQ, you should use HTML in output
         // arguments:
         // msg: { name: string; content: string; groupName: string }
         // kwd: string, matched keyword, can be `undefined` in mode 'both'
         transformMsg: function (msg, kwd) {
+            let m = `<b>[${msg.name}]</b> ${msg.content}`;
             if (kwd) {
-                return `*[${msg.name}]* ${msg.content.replace(kwd, `\`${kwd}\``)}`;
-            } else {
-                return `*[${msg.name}]* ${msg.content}`;
+                m = m.replace(kwd, `<code>${kwd}</code>`);
             }
+            return m;
         }
     },
     qq: {
