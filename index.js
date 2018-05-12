@@ -9,7 +9,7 @@ const SocksProxyAgent = require('socks-proxy-agent');
 
 const config = require('./config');
 
-const telegrafOpt = { telegram: {} };
+const telegrafOpt = { telegram: {}, msgId: null, qrMsgId: null };
 
 if (config.tg.proxy) {
     telegrafOpt.telegram.agent = new SocksProxyAgent(config.tg.proxy);
@@ -17,18 +17,18 @@ if (config.tg.proxy) {
 
 const tgBot = new tg(config.tg.bot_token, telegrafOpt);
 
-let qqOpt = {};
+let qqOpt = { online: false };
 if (config.qq.id && config.qq.pwd) {
-    qqOpt = {
+    Object.assign(qqOpt, {
         app: { login: qq.QQ.LOGIN.PWD },
         auth: { u: config.qq.id, p: config.qq.pwd }
-    }
+    });
 }
 
 const qqBot = new qq.QQ(qqOpt);
 
 const server = http.createServer((req, res) => {
-    if (req.method === 'GET' && ~req.url.indexOf(config.server.get_qr_path)) {
+    if (req.method === 'GET' && req.url.startsWith(config.server.get_qr_path)) {
         fs.createReadStream(qqBot.options.qrcodePath).pipe(res);
     }
 });
@@ -36,7 +36,31 @@ const server = http.createServer((req, res) => {
 server.listen(config.server.port);
 
 function notifyManager(...args) {
-    tgBot.telegram.sendMessage(config.tg.manager_id, ...args);
+    if (telegrafOpt.msgId) {
+        return tgBot.telegram.editMessageText(config.tg.manager_id, telegrafOpt.msgId, null, ...args);
+    }
+    return tgBot.telegram
+        .sendMessage(config.tg.manager_id, ...args)
+        .then(ret => {
+            telegrafOpt.msgId = ret.message_id;
+            return ret;
+        });
+}
+
+function sendQRImage(...args) {
+    return tgBot.telegram
+        .sendPhoto(config.tg.manager_id, ...args)
+        .then(ret => {
+            telegrafOpt.qrMsgId = ret.message_id;
+            return ret;
+        });
+}
+
+function deleteQRImage() {
+    if (telegrafOpt.qrMsgId) {
+        tgBot.telegram.deleteMessage(config.tg.manager_id, telegrafOpt.qrMsgId);
+        telegrafOpt.qrMsgId = null;
+    }
 }
 
 // Set bot username
@@ -61,7 +85,7 @@ tgBot.command('whereisthis', (ctx) => {
             message = `This private chat id as well as your uid is \`${ctx.message.chat.id}\``;
             break;
         default:
-            message = `Chat type: ${ctx.message.chat.type}; Chat id ${ctx.message.chat.id}`;
+            message = `Chat type: ${ctx.message.chat.type}; Chat id \`${ctx.message.chat.id}\``;
     }
     ctx.reply(message, {
         parse_mode: 'Markdown',
@@ -71,12 +95,13 @@ tgBot.command('whereisthis', (ctx) => {
 
 /* eslint-disable  no-case-declarations */
 
-tgBot.on('message', (ctx) => {
+function tgMsgHandler(ctx, next, handler) {
     if (!qqBot._alive) return;
-    switch (ctx.message.chat.type) {
+    const message = ctx.message || ctx.editedMessage;
+    switch (message.chat.type) {
         case 'group':
         case 'supergroup':
-            const { id, username } = ctx.message.chat;
+            const { id, username } = message.chat;
             config.rules.forEach(r => {
                 if (r.tg_chat_id == id || r.tg_chat_id == username) {
                     switch (r.type) {
@@ -85,10 +110,14 @@ tgBot.on('message', (ctx) => {
                                 .filter(g => g.name == r.qq_group_name)
                                 .map(g => g.gid)
                                 .pop();
-                            const msg = config.qq.transformMsg(ctx.message);
+                            const msg = {
+                                name: message.from.username || `${message.from.first_name} ${message.from.last_name || ''}`,
+                                content: handler(message)
+                            };
+                            const text = config.qq.transformMsg(msg);
                             // stroe last sent msg, to avoid duplicate forward
-                            r.lastMsg = msg;
-                            qqBot.sendGroupMsg(r.gid, msg);
+                            r.lastMsg = text;
+                            qqBot.sendGroupMsg(r.gid, text);
                             break;
                         default:
                             break;
@@ -99,7 +128,11 @@ tgBot.on('message', (ctx) => {
         default:
             break;
     }
-});
+}
+
+tgBot.on(['text', 'edited_message'], (ctx, next) => tgMsgHandler(ctx, next, message => message.text));
+
+tgBot.on('sticker', (ctx, next) => tgMsgHandler(ctx, next, message => `(Sticker) ${message.sticker.emoji}`));
 
 tgBot.startPolling();
 
@@ -136,36 +169,33 @@ qqBot.on('group', msg => {
 });
 
 qqBot.on('login', () => {
-    notifyManager('Login action detected');
+    if (qqOpt.online) return;
+    notifyManager('Login...');
 });
 
 qqBot.on('qr', (path, img) => {
-    tgBot.telegram.sendPhoto(config.tg.manager_id, {
-        source: qqBot.options.qrcodePath,
-        filename: `QR_Code_${Date.now()}.png`
-    });
+    deleteQRImage();
+    sendQRImage({ source: img });
 });
 
-qqBot.on('qr-expire', () => {
-    notifyManager('Previous QR Code has expired');
-});
+qqBot.on('qr-expire', () => deleteQRImage());
 
 qqBot.on('start-poll', () => {
-    notifyManager(`QQ Bot \`${qqBot.selfInfo.nick}\` on line`, {
-        parse_mode: 'Markdown'
-    });
+    if (qqOpt.online) return;
+    notifyManager(`${qqBot.selfInfo.nick} online`);
+    qqOpt.online = true;
+    deleteQRImage();
 });
 
-qqBot.on('disconnect', () => {
-    notifyManager('QQ Bot disconnected');
-});
+qqBot.on('cookie-expire', () => {
+    qqOpt.online = false;
+    // send new message when cookie expired
+    telegrafOpt.msgId = null;
+    telegrafOpt.qrMsgId = null;
+})
 
 qqBot.on('error', err => {
-    notifyManager(`QQ Bot encountered error:
-\`\`\`
-${err}
-\`\`\`
-`, { parse_mode: 'Markdown' });
+    notifyManager(`QQ Bot error:\n<pre>${err}</pre>`, { parse_mode: 'HTML' });
 })
 
 qqBot.run();

@@ -33,18 +33,10 @@ module.exports = {
         // QQ pwd
         pwd: 'my_qq_pwd',
         // function to transform msg from Telegram. Plain text only.
-        // argument:
-        // msg: {
-        //     text: string; 
-        //     from: {
-        //         id: number,
-        //         first_name: string,
-        //         last_name: string,
-        //         username: string
-        //     }
-        // }
+        // arguments:
+        // msg: { name: string; content: string; }
         transformMsg: function (msg) {
-            return `[${msg.from.username}] ${msg.text}`;
+            return `[${msg.name}] ${msg.content}`;
         }
     },
     rules: [
@@ -56,7 +48,7 @@ module.exports = {
             // Telegram group chat ID, can be number or @group_name
             tg_chat_id: '@the_target_group',
             // keywords. MUST be an array of string.
-            listen_keywords: keywordList
+            listen_keywords: moreKeywords
         },
         {
             // forward any msg qq->tg and tg->qq
